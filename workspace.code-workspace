@@ -10,8 +10,7 @@
 			"path": "project"
 		},
 		{
-			"name": "go-micro",
-			"path": "."
+			"path": "authentication-service"
 		}
 	],
 	"settings": {
