@@ -1,0 +1,24 @@
+{
+	"folders": [
+		{
+			"path": "front-end"
+		},
+		{
+			"path": "broker-service"
+		},
+		{
+			"path": "project"
+		},
+		{
+			"name": "go-micro",
+			"path": "."
+		}
+	],
+	"settings": {
+		"github.gitAuthentication": true
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": []
+	}
+}
