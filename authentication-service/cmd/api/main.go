@@ -27,12 +27,15 @@ func main() {
 	// log startup event
 	log.Printf("Starting authentication service on port %s\n", webPort)
 
-	app := Config{}
-
 	// connect to DB
 	conn := connectToDb()
 	if conn == nil {
 		log.Panic("Can't connect to Postgres!")
+	}
+
+	app := Config{
+		DB:     conn,
+		Models: data.New(conn),
 	}
 
 	// define http server
