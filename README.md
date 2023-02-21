@@ -34,9 +34,9 @@ Summary:
   - Cover backend and front-end code with unit-tests to level you feel appropriate
   - Check in your code to any git repo (bitbucket, gitlab, github)
     - You can create 2 repositories for Go and Angular code or 1 mono-repo (whichever you prefer)
-  - See Data Model below:
-    - [image001.png](https://trello.com/1/cards/63f102b8b0925ae2243f7bf6/attachments/63f102d3f0201494ce4d13a2/download/image001.png "‌")
+  - Data Model:
+    ![DB Model](https://user-images.githubusercontent.com/6537603/220426065-fa5e6e3e-9d62-478d-bf89-ffac4c02ebac.png)
 
-    To Do:
+    README To Do:
     > - _Add Docker instructions_
     > - _Add Git CI Actions_ 
