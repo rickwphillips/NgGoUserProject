@@ -1,8 +1,8 @@
+DROP TABLE IF EXISTS public.users;
 
 
---
--- Name: user_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
+Name: user_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+
 
 CREATE SEQUENCE public.user_id_seq
     START WITH 1
@@ -23,13 +23,14 @@ SET default_table_access_method = heap;
 --
 
 CREATE TABLE public.users (
-    id bigint DEFAULT nextval('public.user_id_seq'::regclass) NOT NULL,
-    user_name character varying(50),
+    id integer DEFAULT nextval('public.user_id_seq'::regclass) NOT NULL,
+    email character varying(255),
     first_name character varying(255),
     last_name character varying(255),
-    email character varying(255),
+    password character varying(60),
     user_status integer DEFAULT 1,
-    department character varying(255),
+    user_name character varying(50),
+    department character varying(255)
 );
 
 
@@ -50,12 +51,10 @@ ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
 
 
-INSERT INTO "public"."users"("user_name","first_name","last_name","email","user_status","department")
+INSERT INTO "public"."users"("email","first_name","last_name","password","user_status","user_name","department")
 VALUES
-(E'admin',E'Admin',E'User',E'admin@example.com',1,E'I.T.');
-(E'bobross',E'Bob',E'Ross',E'bobross@example.com',1,E'Sales');
+(E'admin@example.com',E'Admin',E'User',E'$2a$12$1zGLuYDDNvATh4RA4avbKuheAMpb1svexSzrQm7up.bnpwQHs0jNe',1,E'admin',E'IT');
 
-
-
-
-
+INSERT INTO "public"."users"("email","first_name","last_name","password","user_status","user_name","department")
+VALUES
+(E'bobross@example.com',E'Bob',E'Ross',E'$2a$12$1zGLuYDDNvATh4RA4avbKuheAMpb1svexSzrQm7up.bnpwQHs0jNe',1,E'bobross',E'Sales');
