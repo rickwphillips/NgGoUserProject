@@ -1,83 +1,29 @@
 package main
 
 import (
-	"errors"
-	"fmt"
 	"log"
 	"net/http"
+	"strconv"
+
+	"github.com/labstack/echo"
 )
 
 // TODO: Move to new user service
-func (app *Config) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 
-	users, err := app.Models.User.GetAll()
-	if err != nil {
-		app.errorJSON(w, err, http.StatusBadRequest)
+func (app *Config) getUserById(c echo.Context) error {
+
+	// User ID from path `users/:id`
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	user, err := app.Models.User.GetOne(id)
+	if err != nil || user == nil {
+		log.Println("User Error: ", err)
+		return c.String(http.StatusBadRequest, "invalid request")
 	}
 
-	app.writeJSON(w, http.StatusAccepted, users)
-}
+	log.Println("User Found: ", user)
 
-// TODO: Move to new user service and leverage models
-func (app *Config) GetUserByEmail(w http.ResponseWriter, r *http.Request) {
+	c.JSON(200, user)
 
-	var requestPayload struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-
-	err := app.readJSON(w, r, &requestPayload)
-	if err != nil {
-		app.errorJSON(w, err, http.StatusBadRequest)
-		return
-	}
-
-	log.Println(requestPayload)
-
-	// validate the user against the database
-	user, err := app.Models.User.GetByEmail(requestPayload.Email)
-	if err != nil {
-		app.errorJSON(w, errors.New("invalid credentials"), http.StatusBadRequest)
-	}
-
-	app.writeJSON(w, http.StatusAccepted, user)
-
-}
-
-/**
- * Verify user email and password
- */
-func (app *Config) Authenticate(w http.ResponseWriter, r *http.Request) {
-	var requestPayload struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-
-	err := app.readJSON(w, r, &requestPayload)
-	if err != nil {
-		app.errorJSON(w, err, http.StatusBadRequest)
-		return
-	}
-
-	fmt.Println(r)
-
-	// validate the user against the database
-	user, err := app.Models.User.GetByEmail(requestPayload.Email)
-	if err != nil {
-		app.errorJSON(w, errors.New("invalid credentials"), http.StatusBadRequest)
-	}
-
-	valid, err := user.PasswordMatches(requestPayload.Password)
-	if err != nil || !valid {
-		app.errorJSON(w, errors.New("invalid credentials"), http.StatusBadRequest)
-		return
-	}
-
-	payload := jsonResponse{
-		Error:   false,
-		Message: fmt.Sprintf("Logged in user %s", user.Email),
-		Data:    user,
-	}
-
-	app.writeJSON(w, http.StatusAccepted, payload)
+	return nil
 }

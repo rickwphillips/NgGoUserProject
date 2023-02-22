@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"log"
-	"net/http"
 	"os"
 	"time"
 	"user/data"
@@ -31,13 +30,17 @@ func main() {
 		log.Panic("Can't connect to Postgres!")
 	}
 
+	app := Config{
+		DB:     conn,
+		Models: data.New(conn),
+	}
+
 	// Create echo server
 	e := echo.New()
 
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
-	})
-	e.Logger.Fatal(e.Start(":1323"))
+	e.GET("/user/:id", app.getUserById)
+
+	e.Logger.Fatal(e.Start(":80"))
 
 }
 

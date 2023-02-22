@@ -4,17 +4,24 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"log"
 	"net/http"
 )
 
 type RequestPayload struct {
 	Action string      `json:"action"`
 	Auth   AuthPayload `json:"auth,omitempty"`
+	Id     string      `json:"id,omitempty"`
 }
 
 type AuthPayload struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type IdPayload struct {
+	Id string `json:"id"`
 }
 
 func (app *Config) Broker(w http.ResponseWriter, r *http.Request) {
@@ -39,9 +46,58 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 	switch requestPayload.Action {
 	case "auth":
 		app.authenticate(w, requestPayload.Auth)
+	case "getById":
+		app.getUserById(w, requestPayload.Id)
 	default:
 		app.errorJSON(w, errors.New("unknown action"))
 	}
+}
+
+func (app *Config) getUserById(w http.ResponseWriter, id string) {
+
+	// call the service
+	request, err := http.NewRequest("GET", fmt.Sprintf("http://user-service/user/%s", id), nil)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		app.errorJSON(w, errors.New("error calling user service"))
+		log.Println("Get User By Id Responses: ", response.StatusCode, response.Status)
+		return
+	}
+
+	// read the response body
+	var jsonFromService jsonResponse
+
+	err = json.NewDecoder(response.Body).Decode(&jsonFromService)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	if jsonFromService.Error {
+		app.errorJSON(w, err, http.StatusBadRequest)
+		return
+	}
+
+	log.Println("json From Service: ", jsonFromService, response)
+
+	var payload jsonResponse
+	payload.Error = false
+	payload.Message = "User Found!"
+	payload.Data = jsonFromService.Data // user data
+
+	app.writeJSON(w, http.StatusAccepted, payload)
 }
 
 func (app *Config) authenticate(w http.ResponseWriter, a AuthPayload) {

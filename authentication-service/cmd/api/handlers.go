@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 )
 
@@ -32,8 +31,6 @@ func (app *Config) GetUserByEmail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println(requestPayload)
-
 	// validate the user against the database
 	user, err := app.Models.User.GetByEmail(requestPayload.Email)
 	if err != nil {
@@ -58,8 +55,6 @@ func (app *Config) Authenticate(w http.ResponseWriter, r *http.Request) {
 		app.errorJSON(w, err, http.StatusBadRequest)
 		return
 	}
-
-	fmt.Println(r)
 
 	// validate the user against the database
 	user, err := app.Models.User.GetByEmail(requestPayload.Email)
